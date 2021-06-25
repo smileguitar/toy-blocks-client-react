@@ -1,4 +1,11 @@
-import {CHECK_NODE_STATUS_START, CHECK_NODE_STATUS_SUCCESS, CHECK_NODE_STATUS_FAILURE} from '../constants/actionTypes';
+import {
+  CHECK_NODE_STATUS_START,
+  CHECK_NODE_STATUS_SUCCESS,
+  CHECK_NODE_STATUS_FAILURE,
+  FETCH_NODE_BLOCKS_START,
+  FETCH_NODE_BLOCKS_SUCCESS,
+  FETCH_NODE_BLOCKS_FAILURE
+} from '../constants/actionTypes';
 import initialState from './initialState';
 
 export default function nodesReducer(state = initialState().nodes, action) {
@@ -50,6 +57,59 @@ export default function nodesReducer(state = initialState().nodes, action) {
             ...state.list[nodeIndex],
             online: false,
             loading: false
+          },
+          ...state.list.slice(nodeIndex + 1)
+        ];
+      }
+      return {
+        ...state,
+        list
+      };
+    case FETCH_NODE_BLOCKS_START:
+      list = state.list;
+      nodeIndex = state.list.findIndex(p => p.url === action.node.url);
+      if (nodeIndex >= 0) {
+        list = [
+          ...state.list.slice(0, nodeIndex),
+          {
+            ...state.list[nodeIndex],
+            loadingBlocks: true
+          },
+          ...state.list.slice(nodeIndex + 1)
+        ];
+      }
+      return {
+        ...state,
+        list
+      };
+    case FETCH_NODE_BLOCKS_SUCCESS:
+      list = state.list;
+      nodeIndex = state.list.findIndex(p => p.url === action.node.url);
+      if (nodeIndex >= 0) {
+        list = [
+          ...state.list.slice(0, nodeIndex),
+          {
+            ...state.list[nodeIndex],
+            blocks: action.res?.data,
+            loadingBlocks: false
+          },
+          ...state.list.slice(nodeIndex + 1)
+        ];
+      }
+      return {
+        ...state,
+        list
+      };
+    case FETCH_NODE_BLOCKS_FAILURE:
+      list = state.list;
+      nodeIndex = state.list.findIndex(p => p.url === action.node.url);
+      if (nodeIndex >= 0) {
+        list = [
+          ...state.list.slice(0, nodeIndex),
+          {
+            ...state.list[nodeIndex],
+            blocks: false,
+            loadingBlocks: false
           },
           ...state.list.slice(nodeIndex + 1)
         ];

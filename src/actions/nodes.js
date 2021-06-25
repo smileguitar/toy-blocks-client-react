@@ -50,3 +50,55 @@ export function checkNodeStatuses(list) {
     });
   };
 }
+
+// here is getting blocks actions
+
+const fetchNodeBlocksStart = (node) => {
+  return {
+    type: types.FETCH_NODE_BLOCKS_START,
+    node,
+  };
+};
+
+const fetchNodeBlocksSuccess = (node, res) => {
+  return {
+    type: types.FETCH_NODE_BLOCKS_SUCCESS,
+    node,
+    res,
+  };
+};
+
+const fetchNodeBlocksFailure = (node) => {
+  return {
+    type: types.FETCH_NODE_BLOCKS_FAILURE,
+    node,
+  };
+};
+
+export function fetchNodeBlocks(node) {
+  return async (dispatch) => {
+    try {
+      dispatch(fetchNodeBlocksStart(node));
+      const res = await fetch(`${node.url}/api/v1/blocks`);
+
+      if (res.status >= 400) {
+        dispatch(fetchNodeBlocksFailure(node));
+        return;
+      }
+
+      const json = await res.json();
+
+      dispatch(fetchNodeBlocksSuccess(node, json));
+    } catch (err) {
+      dispatch(fetchNodeBlocksFailure(node));
+    }
+  };
+}
+
+export function fetchNodesBlocks(list) {
+  return (dispatch) => {
+    list.forEach((node) => {
+      dispatch(fetchNodeBlocks(node));
+    });
+  };
+}

@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     };
   },
   text: ({ online }) => ({
-    fontSize: theme.typography.pxToRem(14),
+    fontSize: theme.typography.pxToRem(10),
     display: "block",
     lineHeight: 1.5,
     fontWeight: "400",

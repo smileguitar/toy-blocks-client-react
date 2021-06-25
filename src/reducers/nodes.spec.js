@@ -11,13 +11,17 @@ describe('Reducers::Nodes', () => {
   const nodeA = {
     url: 'http://localhost:3002',
     online: false,
-    name: null
+    name: null,
+    blocks: [],
+    loadingBlocks: false,
   };
 
   const nodeB = {
     url: 'http://localhost:3003',
     online: false,
-    name: null
+    name: null,
+    blocks: [],
+    loadingBlocks: false,
   };
 
   it('should set initial state by default', () => {
@@ -92,4 +96,61 @@ describe('Reducers::Nodes', () => {
 
     expect(reducer(appState, action)).toEqual(expected);
   });
+
+  it('should handle FETCH_NODE_BLOCKS_START', () => {
+    const appState = {
+      list: [nodeA, nodeB]
+    };
+    const action = { type: ActionTypes.FETCH_NODE_BLOCKS_START, node: nodeA };
+    const expected = {
+      list: [
+        {
+          ...nodeA,
+          loadingBlocks: true
+        },
+        nodeB
+      ]
+    };
+
+    expect(reducer(appState, action)).toEqual(expected);
+  });
+
+  it('should handle FETCH_NODE_BLOCKS_SUCCESS', () => {
+    const appState = {
+      list: [nodeA, nodeB]
+    };
+    const action = { type: ActionTypes.FETCH_NODE_BLOCKS_SUCCESS, node: nodeA, res: {data: []} };
+    const expected = {
+      list: [
+        {
+          ...nodeA,
+          blocks: [],
+          loadingBlocks: false
+        },
+        nodeB
+      ]
+    };
+
+    expect(reducer(appState, action)).toEqual(expected);
+  });
+
+  it('should handle FETCH_NODE_BLOCKS_FAILURE', () => {
+    const appState = {
+      list: [nodeA, nodeB]
+    };
+    const action = { type: ActionTypes.FETCH_NODE_BLOCKS_FAILURE, node: nodeA };
+    const expected = {
+      list: [
+        {
+          ...nodeA,
+          blocks: false,
+          loadingBlocks: false
+        },
+        nodeB
+      ]
+    };
+
+    expect(reducer(appState, action)).toEqual(expected);
+  });
+
 });

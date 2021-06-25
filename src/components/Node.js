@@ -11,9 +11,26 @@ import {
 } from "@material-ui/core";
 import colors from "../constants/colors";
 import Status from "./Status";
+import Block from "./Block";
 
 const Node = ({ node, expanded, toggleNodeExpanded }) => {
   const classes = useStyles();
+
+  const blocksView = (node) => {
+    if (node.loadingBlocks) {
+      return 'loading';
+    }
+    if (node.blocks === false) {
+      return 'error';
+    }
+    if (node.blocks?.length === 0) {
+      return 'Empty blocks';
+    }
+    return node.blocks?.map(block => {
+      return <Block id={block.id} data={block?.attributes?.data} />
+    });
+  };
+
   return (
     <Accordion
       elevation={3}
@@ -45,8 +62,8 @@ const Node = ({ node, expanded, toggleNodeExpanded }) => {
           <Status loading={node.loading} online={node.online} />
         </Box>
       </AccordionSummary>
-      <AccordionDetails>
-        <Typography>Blocks go here</Typography>
+      <AccordionDetails className={classes.body}>
+        <Box className={classes.bodyContent}>{blocksView(node)}</Box>
       </AccordionDetails>
     </Accordion>
   );
@@ -79,14 +96,14 @@ const useStyles = makeStyles((theme) => ({
   },
   expanded: {
     "& $icon": {
-      paddingLeft: 0,
-      paddingRight: 12,
-      top: -10,
-      marginRight: 0,
+      // paddingLeft: 0,
+      // paddingRight: 12,
+      // top: -10,
+      // marginRight: 0,
     },
   },
   heading: {
-    fontSize: theme.typography.pxToRem(17),
+    fontSize: theme.typography.pxToRem(16),
     display: "block",
     color: colors.text,
     lineHeight: 1.5,
@@ -96,6 +113,12 @@ const useStyles = makeStyles((theme) => ({
     color: colors.faded,
     lineHeight: 2,
   },
+  body: {
+    padding: "0 24px",
+  },
+  bodyContent: {
+    width: '100%'
+  }
 }));
 
 Node.propTypes = {
@@ -104,6 +127,8 @@ Node.propTypes = {
     online: PropTypes.bool,
     name: PropTypes.string,
     loading: PropTypes.bool,
+    blocks: PropTypes.array | PropTypes.bool,
+    loadingBlocks: PropTypes.bool
   }).isRequired,
   expanded: PropTypes.bool,
   toggleNodeExpanded: PropTypes.func.isRequired,

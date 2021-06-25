@@ -63,4 +63,50 @@ describe("Actions", () => {
 
     expect(dispatch.mock.calls.flat()).toEqual(expected);
   });
+
+  it("should fetch the node blocks", async () => {
+    mockFetch.mockReturnValueOnce(
+      Promise.resolve({
+        status: 200,
+        json() {
+          return Promise.resolve({ data: [] });
+        },
+      })
+    );
+    await ActionCreators.fetchNodeBlocks(node)(dispatch);
+    const expected = [
+      {
+        type: ActionTypes.FETCH_NODE_BLOCKS_START,
+        node,
+      },
+      {
+        type: ActionTypes.FETCH_NODE_BLOCKS_SUCCESS,
+        node,
+        res: { data: [] },
+      },
+    ];
+
+    expect(dispatch.mock.calls.flat()).toEqual(expected);
+  });
+
+  it("should fail to fetch the node blocks", async () => {
+    mockFetch.mockReturnValueOnce(
+      Promise.resolve({
+        status: 400,
+      })
+    );
+    await ActionCreators.fetchNodeBlocks(node)(dispatch);
+    const expected = [
+      {
+        type: ActionTypes.FETCH_NODE_BLOCKS_START,
+        node,
+      },
+      {
+        type: ActionTypes.FETCH_NODE_BLOCKS_FAILURE,
+        node,
+      },
+    ];
+
+    expect(dispatch.mock.calls.flat()).toEqual(expected);
+  });
 });
